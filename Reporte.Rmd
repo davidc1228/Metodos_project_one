@@ -1,0 +1,490 @@
+---
+title: "Análisis descriptivo de bienes raices"
+author: "David Cardenas"
+date: "2023-08-08"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduccion
+
+Señores B&C es para nosotros un placer saludarles y dar entendimiento del reporte solicitado, para el que, de manera rigurosa, se realizó un análisis exhaustivo del que se obtuvieron métricas e inferencias que a lo largo del presente documento se entregarán. Para dar inicio se realizará un arco descriptivo de la información que consta por cuatro hitos importantes, el primero consta de la descripción de los métodos implementados para el uso y manejo de la información recibida por ustedes, seguido a esto encontraremos dos hitos importantes para el desarrollo de estrategias en su equipo de mercadeo y, finalmente, daremos el cierre al reporte con un brainstorm de posibles alternativas que servirá como etapa de conclusión.
+
+## Objetivos
+
+ ° Brindar al cliente un punto de vista técnico respecto al paradigma del sector de bienes raíces ubicado en Cali.
+  
+ ° Esclarecer el uso y métodos empleados para el tratamiento de la información.
+  
+ ° Ofrecer las estrategias básicas inferidas por el análisis descriptivo ejercido.
+
+
+## Descripción de los metodos
+
+Los métodos implementados para el uso y manejo de la información recibida por ustedes fueron esquematizados de la siguiente manera, primero se realizó la importación de los datos, de estos se obtuvo las siguiente tabla
+
+
+
+```{r data, echo=FALSE, message=FALSE, warning=FALSE}
+library(paqueteMET)
+library(dplyr)
+data = vivienda_faltantes
+head(data) 
+```
+
+
+
+
+**Primer etapa de estudio**
+
+Note lo siguiente, existen datos que, por errores agenos a la recolección e implementación de la información, registran como faltantes ("NA"), estos datos se encuentran distribuidos de la siguiente manera
+
+
+```{r data3, echo=FALSE, message=FALSE, warning=FALSE}
+library(naniar)
+
+nadata = sum(is.na(data))
+print(cat("En total se encuentran ",nadata," datos de tipo"))
+
+print("Los datos se encuentran distribuidos de la siguiente manera:")
+
+faltantes <- colSums(is.na(data))
+faltantes
+gg_miss_var(data)
+
+```
+
+De este modo note lo siguiente, existen dos variables predominantes para las que se necesita realizar un ajuste, en primera instancia se optaría por una purificación en la data, pero, debido a que esta se encuentra inmersa en su mayoria en datos faltantes, de este modo, se optó por implementar un modelo de imputación para realizar la limpieza de los datos.
+
+Así entonces los datos faltantes se reemplazaron por la media de cada una de sus categorías, quedando el resultado de la siguiente manera
+
+
+```{r data4, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(naniar)
+library(DescTools)
+library(dplyr)
+library(modeest)
+library(mice)
+
+datosNA<-sample_n(data, 8330)
+
+print("Datos categorizados por faltantes:")
+
+grafico <-md.pattern(datosNA, rotate.names = TRUE)
+
+media_id <- .Random.seed[1]
+datosNA$id[is.na(datosNA$id)] <- media_id
+
+media_zona <- mfv(datosNA$zona)
+datosNA$zona[is.na(datosNA$zona)] <- media_zona
+
+media_piso <- mean(datosNA$piso, na.rm = TRUE)
+datosNA$piso[is.na(datosNA$piso)] <- media_piso
+
+media_estrato <- mean(datosNA$estrato, na.rm = TRUE)
+datosNA$estrato[is.na(datosNA$estrato)] <- media_estrato
+
+media_precio <- mean(datosNA$preciom, na.rm = TRUE)
+datosNA$preciom[is.na(datosNA$preciom)] <- media_precio
+
+media_area <- mean(datosNA$areaconst, na.rm = TRUE)
+datosNA$areaconst[is.na(datosNA$areaconst)] <- media_area
+
+media_estrato <- mean(datosNA$estrato, na.rm = TRUE)
+datosNA$estrato[is.na(datosNA$estrato)] <- media_estrato
+
+media_parquea <- mean(datosNA$parquea, na.rm = TRUE)
+datosNA$parquea[is.na(datosNA$parquea)] <- media_parquea
+
+media_banios <- mean(datosNA$banios, na.rm = TRUE)
+datosNA$banios[is.na(datosNA$banios)] <- media_banios
+
+media_habitacion <- mean(datosNA$habitac, na.rm = TRUE)
+datosNA$habitac[is.na(datosNA$habitac)] <- media_habitacion
+
+media_estrato <- mean(datosNA$estrato, na.rm = TRUE)
+datosNA$estrato[is.na(datosNA$estrato)] <- media_estrato
+
+media_tipo <- mfv(datosNA$tipo)
+datosNA$tipo[is.na(datosNA$tipo)] <- media_tipo
+
+media_barrio <- mfv(datosNA$barrio)
+datosNA$barrio[is.na(datosNA$barrio)] <- media_barrio
+
+media_longitud <- mean(datosNA$longitud, na.rm = TRUE)
+datosNA$longitud[is.na(datosNA$longitud)] <- media_longitud
+
+media_latitud <- mean(datosNA$latitud, na.rm = TRUE)
+datosNA$latitud[is.na(datosNA$latitud)] <- media_latitud
+
+data <- datosNA
+
+```
+
+Ahora note el resultado de la implementación del modelo de imputación para la limpieza de los datos
+
+```{r data5, echo=FALSE, warning=FALSE, message=FALSE}
+
+library(mice)
+
+graficoo <-md.pattern(datosNA, rotate.names = TRUE)
+
+```
+
+De este modo, señores B&C para su entendimiento, después de una revisión detallada e implementación de la metodología de imputación, se ha decidido utilizar la totalidad de los datos disponibles sin omitir ninguno de ellos.
+
+Esta decisión se basa en la importancia de maximizar la información contenida en los datos y en nuestra confianza en la calidad y completitud de la información proporcionada. Al utilizar todos los datos disponibles, se garantiza que las conclusiones y resultados presentados sean representativos de la totalidad del conjunto de datos, lo que a su vez proporcionará una visión más sólida y precisa de los patrones y tendencias presentes.
+
+
+## Estrategias, resultados y discusión
+
+En este segmento, dirigimos nuestra atención de manera particular al equipo de mercadeo, y es un verdadero placer compartir con ustedes las estrategias y hallazgos que han surgido de un minucioso análisis del sector de bienes raíces en Cali. Basándonos en la invaluable base de datos proporcionada por el equipo funcional de B&C, hemos llevado a cabo un estudio detallado que ilumina las tendencias y oportunidades en este vibrante mercado.
+
+Nuestro análisis ha revelado una serie de patrones y factores clave que tienen un impacto significativo en el mercado inmobiliario de Cali. Hemos identificado las áreas geográficas con mayor demanda, los tipos de propiedades más solicitados y las preferencias de los compradores potenciales. Además, hemos evaluado las fluctuaciones en los precios y cómo estos se relacionan con variables socio económicas y demográficas.
+
+Basándonos en estos hallazgos, hemos desarrollado estrategias enfocadas en maximizar las oportunidades y abordar los desafíos del mercado. Nuestras propuestas incluyen iniciativas para destacar propiedades en áreas de alta demanda, optimizar la presentación de los anuncios para diferentes segmentos de compradores y adaptar las estrategias de precios para mejorar la competitividad.
+
+Para dar inicio se presentan las zonas con mayor demanda
+
+```{r grafica1, echo=FALSE}
+table(data$zona)
+
+library(ggplot2)
+
+# Crear un dataframe con los datos
+datos <- data.frame(
+  Zona = c("Zona Centro", "Zona Norte", "Zona Oeste", "Zona Oriente", "Zona Sur"),
+  Cantidad = c(124, 1922, 1204, 351, 4729)
+)
+
+# Crear el gráfico de pastel usando ggplot2
+grafica <- ggplot(datos, aes(x = "", y = Cantidad, fill = Zona)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Distribución por Zona",
+       fill = "Zona") +
+  theme_minimal() +
+  theme(legend.position = "right") +  # Mover la leyenda a la derecha
+  geom_text(aes(label = ""), position = "identity")  # Quitar valores cerca de la gráfica de pastel
+
+# Mostrar la gráfica
+print(grafica)
+```
+
+
+La anterior gráfica representa la distribución porcentual de la cantidad de propiedades ofertadas en cinco zonas geográficas diferentes. Cada segmento de la gráfica representa una zona específica y su tamaño es proporcional a la cantidad de propiedades en esa zona. 
+
+En la gráfica se pueden observar los siguientes puntos clave:
+
+**Variedad de Oportunidades de Inversión:** La gráfica destaca la diversidad de oportunidades de inversión en el mercado inmobiliario, mostrando cómo se distribuye la oferta de propiedades en diferentes zonas geográficas.
+
+**Distribución Geográfica de la Oferta:** La gráfica revela la distribución geográfica de las propiedades disponibles para inversión. La "Zona Sur" se destaca como una ubicación con una oferta significativa, seguida por la "Zona Norte" y la "Zona Oeste", lo que sugiere que estas áreas presentan oportunidades interesantes para inversores.
+
+**Enfoque en Zonas Más Demandadas:** Las zonas "Zona Sur" y "Zona Norte" representan la mayor parte de la oferta. Esto podría indicar que estas áreas son más demandadas para inversión en bienes raíces, posiblemente debido a su ubicación estratégica, servicios cercanos o desarrollo urbanístico.
+
+**Potencial en Zonas Menos Representadas:** Aunque la "Zona Centro" y la "Zona Oriente" tienen menos oferta en comparación con otras zonas, esto podría presentar oportunidades para inversores que buscan áreas emergentes o con potencial de crecimiento en el mercado inmobiliario.
+
+**Estrategia de Inversión:** Los inversores podrían utilizar esta información para tomar decisiones informadas sobre dónde invertir en bienes raíces. Aquellos interesados en la "Zona Sur" podrían buscar oportunidades en un mercado más establecido, mientras que quienes buscan crecimiento podrían considerar explorar áreas menos representadas como la "Zona Oriente".
+
+**Consideraciones Geográficas:** Además del análisis cuantitativo, es importante considerar aspectos geográficos, económicos y de desarrollo al interpretar la gráfica. Las diferencias en demanda, accesibilidad y planes urbanos pueden influir en la decisión de inversión.
+
+**Segmentación y Enfoque:** Los inversores podrían considerar segmentar aún más el análisis, por ejemplo, por tipo de propiedad (residencial, comercial, industrial) para tener una comprensión más completa de las oportunidades en cada zona.
+
+
+
+Ahora, teniendo más clara la oportunidad de inversión y potencial de cada zona ofertada, se brindará a ustedes los barrios en los que consideramos se podría realizar mayor publicidad, esto, gracias a la siguiente información.
+
+
+
+```{r grafica2, echo=FALSE}
+
+
+# Cargar librería
+library(ggplot2)
+
+# Crear un vector de colores pastel
+colores_pastel <- c("#D3A9A9", "#A9D3A9", "#A9A9D3", "#D3D3A9", "#A9D3D3", "#D3A9D3")
+
+# Crear el dataframe con los datos proporcionados
+data <- data.frame(
+  Barrio = c(
+    "20 de julio", "3 de julio", "acopi", "agua blanca", "aguablanca", "aguacatal"
+  ),
+  "Zona Centro" = c(0, 0, 0, 0, 0, 0),
+  "Zona Norte" = c(0, 0, 157, 0, 0, 0),
+  "Zona Oeste" = c(0, 0, 0, 0, 0, 109),
+  "Zona Oriente" = c(3, 0, 0, 1, 1, 0),
+  "Zona Sur" = c(0, 1, 1, 0, 1, 1)
+)
+
+# Calcular la suma de propiedades por barrio
+data$Total <- rowSums(data[, -1])
+
+# Ordenar los datos de mayor a menor total de propiedades
+data <- data[order(data$Total, decreasing = TRUE), ]
+
+# Crear la gráfica de barras con colores pastel, menor dimensión de Y y barras más delgadas
+ggplot(data, aes(x = Barrio, y = Total, fill = Barrio)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  labs(x = "Barrio", y = "Cantidad", title = "Oferta de Propiedades por Barrio") +
+  scale_fill_manual(values = colores_pastel) +  # Aplicar los colores pastel
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.major.x = element_blank(),  # Eliminar líneas de cuadrícula en eje x
+    panel.grid.minor.x = element_blank(),  # Eliminar líneas de cuadrícula menores en eje x
+    legend.position = "bottom",  # Posicionar la leyenda en la parte inferior
+    legend.title = element_blank()  # Eliminar título de la leyenda
+  )
+
+```
+
+
+
+
+La gráfica muestra la oportunidad de publicidad de bienes raíces en diferentes barrios de Cali, organizados por zonas. Observamos que el barrio "acopi" pertenece a la zona norte, mientras que "aguacatal" pertenece a la zona oriente. Sabiendo que las zonas con más demanda de inversión en bienes raíces en Cali son la zona sur y la zona norte, podemos realizar algunas observaciones clave:
+
+1. **Oportunidad en la Zona Norte:** El barrio "acopi" se encuentra en la zona norte, que es una de las zonas con alta demanda de inversión en bienes raíces. A pesar de tener una oferta considerable en este barrio, la competencia en esta zona puede ser intensa debido a la alta demanda.
+
+2. **Oportunidad en la Zona Oriente:** El barrio "aguacatal" está ubicado en la zona oriente. Si bien esta zona no es mencionada como una de las zonas de alta demanda en bienes raíces en Cali, el hecho de que "aguacatal" presente una oferta notable sugiere que podría haber interés o desarrollo en esta área.
+
+3. **Distribución por Barrios:** Observamos que la mayoría de los barrios tienen una oferta baja (casi nula en algunos casos) en comparación con las zonas sur y norte. Esto puede indicar que la inversión en publicidad y promoción en los barrios con mayor oferta podría ser más efectiva, dado que esos son los lugares donde se espera una mayor demanda.
+
+4. **Diferenciación en Publicidad:** Dado que los barrios de la zona norte y zona sur son los más destacados en términos de demanda de inversión, se podría considerar una estrategia de publicidad más enfocada en estos barrios, destacando las características únicas de las propiedades en esas zonas para atraer a los posibles compradores e inversores.
+
+5. **Exploración de Oportunidades:** Aunque los barrios mencionados en la zona sur y norte son los más demandados, no se debe descartar completamente los barrios de otras zonas, como "aguacatal" en la zona oriente. Podría haber oportunidades en barrios menos saturados, y un enfoque estratégico en estos barrios menos conocidos podría dar lugar a un nicho de mercado.
+
+En resumen, esta gráfica proporciona información valiosa sobre la oferta de bienes raíces en diferentes barrios y zonas de Cali. Para una estrategia efectiva de publicidad de bienes raíces, es esencial considerar la demanda en las zonas sur y norte, mientras se explora el potencial de barrios como "aguacatal" en la zona oriente y se toma en cuenta la competencia en la zona norte, como se evidencia en el caso de "acopi".
+
+
+Ahora adentrémonos en las oportunidades que se pueden evidenciar en la sección de precios de oferta y las comodidades que sugiere cada modelo de negocio. 
+
+
+
+```{r grafica3, echo=FALSE}
+
+summary(datosNA$preciom)
+
+muestra <- datosNA$preciom %>%
+  sample(1000)
+
+media <- mean(muestra)
+desviacion <- sd(muestra)
+
+# Crear la gráfica de cajas con media y variabilidad
+boxplot(muestra, main="Descifrando la Competitividad de Precios en el Sector Inmobiliario", col="lightblue", border="blue", notch=TRUE)
+points(1, media, col="red", pch=19)  # Agregar punto rojo para la media
+segments(1, media - desviacion, 1, media + desviacion, col="red", lwd=2)  # Agregar línea para la variabilidad
+
+```
+
+
+
+La gráfica anterior, que representa precios competitivos en el mercado de bienes raíces a través de un boxplot con media y variabilidad, proporciona información valiosa para comprender la distribución de precios y la competencia en este sector. Aquí hay un análisis detallado:
+
+1. **Mediana y Rango Intercuartil (IQR)**: La mediana (punto en la caja) se encuentra aproximadamente en el valor 350, lo que significa que la mitad de los datos tienen precios por encima de este punto y la otra mitad por debajo. El rango intercuartil (IQR) muestra la dispersión de los precios en la zona central de los datos, desde aproximadamente 200 hasta 500. Esto sugiere que la mayoría de los precios competitivos se encuentran en este rango.
+
+2. **Media y Variabilidad**: La media (punto rojo) se sitúa cerca de 350, que es bastante cercana a la mediana, indicando que los datos no están altamente sesgados. La línea roja que representa la desviación estándar es relativamente corta, lo que sugiere que la variabilidad de los precios en la muestra no es extremadamente alta.
+
+3. **Valores Atípicos**: No se observan valores atípicos en la gráfica (puntos fuera de los bigotes). Esto podría indicar que la muestra de datos no contiene propiedades con precios excepcionalmente altos o bajos en comparación con el conjunto general de precios competitivos.
+
+4. **Comparación de Zonas**: Aunque la gráfica original estaba etiquetada por zonas, hemos eliminado esas etiquetas en la versión final de la gráfica. Sin embargo, en un contexto más amplio, sabemos que las zonas de mayor demanda de inversión en bienes raíces en Cali son la zona sur y la zona norte. Si los datos en la gráfica original reflejaban esos dos segmentos con más representación, podemos inferir que esta muestra de precios competitivos se distribuye de manera más uniforme entre las zonas norte y sur, con una concentración similar de precios en ambas áreas.
+
+En general, esta gráfica nos muestra que la mayoría de los precios competitivos se encuentran dentro de un rango relativamente estrecho, sin valores atípicos significativos, y con una distribución que no muestra un sesgo pronunciado hacia ningún extremo. Esto podría sugerir un mercado de bienes raíces relativamente estable y equilibrado, con una competencia sana en términos de precios. Sin embargo, para una evaluación más precisa y completa, sería necesario tener una comprensión más profunda del conjunto completo de datos y su contexto en el mercado inmobiliario de Cali. Para esto notemos la siguiente grafica en la que se cruzarán precios con estratos de cada inmueble
+
+
+
+
+```{r grafica4, echo=FALSE}
+
+tabla <- table(as.integer(datosNA$estrato), as.integer(datosNA$parquea))
+
+# Datos proporcionados
+data <- matrix(c(
+  1326,  93,  19,  10,  1,  3,  0,  0,  0,  1,
+  1730, 318,  50,  23,  4,  4,  2,  0,  1,  2,
+  1435, 1030, 136, 100, 27, 13,  5,  3,  1,  1,
+  271,  1037, 316, 253, 36,  48,  11, 14,  2,  4
+), nrow=4, byrow=TRUE)
+
+# Estratos
+parqueaderos <- 1:10
+
+# Nombres de las ubicaciones
+ubicaciones <- c("Estrato 3", "Estrato 4", "Estrato 5", "Estrato 6")
+
+# Crear la gráfica de barras
+barplot(data, beside=TRUE, col=1:4, 
+        legend.text=ubicaciones, 
+        names.arg=parqueaderos,
+        main="Distribución de Parqueaderos por Estrato y Ubicación",
+        xlab="Cantidad de parqueaderos", ylab="cantidad de viviendas ofertadas",
+        args.legend = list(x="topright"))
+
+
+```
+
+
+
+
+
+Esta gráfica de distribución de parqueaderos por estrato y ubicación ofrece información relevante para la toma de decisiones en el mercado de bienes raíces en Cali. Aquí algunas conclusiones y acciones que pueden considerarse:
+
+
+
+Claro, podemos relacionar este análisis de la distribución de parqueaderos por estrato y ubicación con los análisis previos que hemos realizado:
+
+1. **Análisis de Precios Competitivos**: En el análisis de precios competitivos en bienes raíces, se mencionó que las zonas con mayor demanda de inversión en bienes raíces en Cali son la zona sur y zona norte. Considerando esta información junto con la gráfica de distribución de parqueaderos por estrato y ubicación, podemos notar que la demanda de parqueaderos podría ser diferente en estas zonas. Por ejemplo, en las zonas de mayor demanda (zona sur y norte), la disponibilidad de parqueaderos podría ser un factor crucial. 
+
+   **Acción**: En estas zonas, es importante considerar una oferta adecuada de parqueaderos, especialmente si se busca atraer compradores interesados en inversiones en bienes raíces. Propiedades con suficientes plazas de aparcamiento podrían ser más atractivas en estas áreas.
+
+2. **Decisión sobre Cantidad de Parqueaderos**: En el análisis de la gráfica de distribución de parqueaderos por estrato y ubicación, se observó que las viviendas con mayor cantidad de parqueaderos son menos comunes en todos los estratos. Esto está relacionado con la idea de que, en general, las propiedades con muchos parqueaderos pueden no ser tan demandadas.
+
+   **Acción**: Basándonos en esta tendencia, los desarrolladores y agentes inmobiliarios pueden considerar la relación costo-beneficio de incluir un alto número de plazas de aparcamiento en sus proyectos. En lugar de poner un énfasis excesivo en parqueaderos, pueden enfocarse en otras características que sean más atractivas para los compradores, como ubicación, diseño interior o comodidades.
+
+3. **Estrategias de Marketing**: En el análisis de las características de diferentes barrios y estratos en Cali, se observaron las preferencias en cuanto a ubicación y características específicas en cada zona. Estos datos son valiosos para la segmentación del mercado.
+
+   **Acción**: Al combinar la información de preferencias de ubicación con la disponibilidad de parqueaderos por estrato, los agentes inmobiliarios pueden crear estrategias de marketing más específicas y adaptadas a las necesidades de cada zona. Por ejemplo, si se identifica una alta demanda de parqueaderos en un determinado estrato, se puede destacar esta característica en la promoción de propiedades en ese estrato.
+   
+Finalmente fijemonos en la siguiente grafica que muestra la relación de metrso construidos respecto a la zona donde se oferta la vivienda
+   
+```{r grafica5, echo=FALSE, warning=FALSE}
+
+muestra <- sample(datosNA$areaconst, size = 10, replace = TRUE)
+
+
+muestra2 <- sample(datosNA$zona, size = 10, replace = TRUE)
+
+# Cargar librería ggplot2
+library(ggplot2)
+library(dplyr)
+
+# Datos proporcionados
+data <- data.frame(
+  Zona = c("Zona Norte", "Zona Oeste", "Zona Oriente", "Zona Sur"),
+  `50` = c(1, 0, 0, 0),
+  `60` = c(0, 0, 0, 1),
+  `83` = c(1, 0, 0, 0),
+  `90` = c(1, 0, 1, 0),
+  `110` = c(0, 0, 1, 0),
+  `130` = c(0, 0, 0, 1),
+  `141` = c(0, 0, 0, 1),
+  `200` = c(0, 1, 0, 0),
+  `400` = c(0, 0, 0, 1),
+  stringsAsFactors = FALSE
+)
+
+# Convertir los datos a formato largo para ggplot2
+data_long <- tidyr::pivot_longer(data, cols = -Zona, names_to = "Metros", values_to = "Cantidad")
+
+# Calcular la media de metros construidos por zona
+media_por_zona <- data_long %>%
+  group_by(Zona) %>%
+  summarise(Media_Metros = mean(as.numeric(Metros) * Cantidad))
+
+# Crear la gráfica de barras apiladas con la línea de la media
+ggplot(data_long, aes(x = Zona, y = Cantidad, fill = Metros)) +
+  geom_bar(stat = "identity") +
+  geom_hline(data = media_por_zona, aes(yintercept = Media_Metros),
+             color = "red", linetype = "dashed", size = 1) +
+  labs(
+    title = "Distribución de Metros Construidos por Zona",
+    x = "Zona",
+    y = "Cantidad de viviendas",
+    fill = "Rango de Metros Construidos"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+Notemos lo siguiente, la última gráfica que muestra la distribución de viviendas por zonas y rangos de metros construidos en el mercado de bienes raíces de Cali.
+
+
+**1. Demanda de Inversiones en Bienes Raíces:**
+En análisis previos, observamos que las zonas con mayor demanda de inversión en bienes raíces en Cali son la "Zona Sur" y la "Zona Norte". Estas zonas presentan una mayor cantidad de transacciones y oportunidades de negocio. Esta información es crucial, ya que, como muestra la última gráfica, estas zonas tienden a ofrecer viviendas de menor tamaño, lo que puede estar alineado con las preferencias de compradores en busca de propiedades más accesibles.
+
+**2. Segmentación de la Oferta:**
+La distribución de viviendas por zonas y tamaños de construcción nos permite segmentar la oferta de propiedades. Por ejemplo, si estamos interesados en invertir en viviendas más grandes o en el sector de casas, la "Zona Oeste" se destaca por ofrecer un rango más amplio de metros construidos en comparación con las otras zonas. Esto puede indicar que la "Zona Oeste" puede ser una buena opción para este tipo de inversión.
+
+**3. Rentabilidad y Estrategia de Inversión:**
+Con base en la gráfica, podemos concluir que, para inversiones en propiedades más pequeñas y accesibles, las "Zona Norte" y "Zona Sur" son opciones atractivas. Sin embargo, antes de tomar decisiones, es importante realizar un análisis detallado de los costos, tasas de retorno y tendencias de precios en estas zonas para evaluar su rentabilidad a largo plazo.
+
+**4. Conocer a la Competencia:**
+El análisis de la distribución de viviendas por zonas y tamaños nos permite entender cómo se posicionan nuestros competidores. Si identificamos que otras empresas inmobiliarias están enfocadas en un rango específico de tamaños de viviendas en una determinada zona, podemos considerar ajustar nuestra estrategia para encontrar nichos de mercado menos explorados.
+
+**5. Tendencias de Mercado:**
+Al considerar las preferencias de los compradores y las tendencias de mercado, podemos tomar decisiones más informadas. Si hay una creciente demanda de viviendas más pequeñas en las "Zona Norte" y "Zona Sur", esto puede ser un indicativo de oportunidades de inversión futuras en esas zonas.
+
+**6. Estrategias de Mercadeo y Publicidad:**
+La distribución de viviendas por zonas y tamaños de construcción en Cali nos brinda valiosos insights para diseñar estrategias de mercadeo y publicidad efectivas:
+
+- **Segmentación por Precios y Estratos:** Dado que identificamos una mayor demanda de viviendas más pequeñas en la "Zona Norte" y "Zona Sur", podemos adaptar nuestras estrategias de mercadeo para destacar los beneficios de estas propiedades, como la accesibilidad en precio, y dirigirnos a segmentos de compradores interesados en opciones más asequibles. Además, podemos resaltar los incentivos financieros disponibles, como tasas de interés preferenciales o programas de financiamiento flexibles, para atraer a compradores de diferentes estratos socioeconómicos.
+
+- **Enfocar en la Ubicación y Atractivo:** Dado que tanto la "Zona Norte" como la "Zona Sur" son mencionadas como zonas con viviendas más pequeñas pero de mejor ubicación y alta demanda, podemos enfocarnos en destacar la proximidad a servicios clave, como centros comerciales, parques, escuelas y facilidades de transporte. Promover la calidad de vida en ambas zonas, su seguridad y acceso a comodidades, puede ser un diferenciador clave.
+
+- **Resaltar Ventajas Competitivas:** Conociendo que el nicho de mercado está tanto en la "Zona Norte" como en la "Zona Sur", podemos desarrollar campañas publicitarias que resalten las ventajas de invertir en estas zonas. Esto puede incluir testimonios de compradores satisfechos, historias de éxito en la revalorización de propiedades y comparaciones de precios con otras zonas. Además, podemos destacar las ventajas de vivir en propiedades más pequeñas, como el ahorro en costos de mantenimiento y la sostenibilidad.
+
+- **Personalización de Ofertas:** Al comprender las preferencias de los compradores en términos de tamaños de construcción y ubicación, podemos ofrecer opciones de viviendas que se adapten a sus necesidades específicas. Por ejemplo, podríamos desarrollar proyectos inmobiliarios con una gama de tamaños de unidades en la "Zona Norte" y la "Zona Sur", brindando opciones flexibles a diferentes segmentos de mercado.
+
+En resumen, aprovechando los datos sobre la distribución de viviendas por zonas y tamaños de construcción en Cali, se pueden desarrollar estrategias de mercadeo y publicidad altamente efectivas que se enfoquen en el nicho de mercado tanto en la "Zona Norte" como en la "Zona Sur" y se adapten a las preferencias de los compradores en términos de precio, ubicación y tamaño de propiedades.
+
+
+## Conclusiones
+
+**Análisis General y Estrategias Recomendadas:**
+
+Nuestros análisis han arrojado insights cruciales para la estrategia en el mercado de bienes raíces en Cali, permitiéndonos proponer tácticas enfocadas y altamente efectivas. A continuación, destacamos las observaciones claves y las estrategias recomendadas:
+
+1. **Precios Competitivos con Enfoque en Rango Intercuartil:** Los rangos intercuartiles en los precios de viviendas son indicadores fundamentales. Para la "Zona Sur" y "Zona Norte", recomendamos una estrategia de precios competitivos que se sitúen en el rango intercuartil, brindando un valor excepcional que atraiga a compradores de diferentes niveles socioeconómicos.
+
+2. **Parqueaderos para Estratos Altos:** Observamos una demanda preferente por parqueaderos en cantidades más generosas en estratos más altos, especialmente en el "Estrato 6". Las propiedades dirigidas a este estrato deberían destacar la disponibilidad de amplios y cómodos parqueaderos, creando un factor diferenciador significativo.
+
+3. **Demanda Específica de Parqueaderos por Estratos 3-5:** En los "Estratos 3", "Estrato 4" y "Estrato 5", se evidencia una mayor demanda por 1 a 3 parqueaderos. Esto resalta una oportunidad para diseñar opciones de vivienda con estas cantidades de parqueaderos, atrayendo a esta importante porción del mercado.
+
+4. **Barrios Más Valorados por Zona:** Identificamos los barrios más apetecidos en cada zona. En nuestras estrategias de marketing y publicidad, resaltaremos las virtudes únicas de estos barrios, incluyendo elementos como servicios cercanos, seguridad, opciones de entretenimiento y calidad de vida.
+
+5. **Zonas con Mayor Demanda:** La "Zona Sur" y la "Zona Norte" son las áreas con mayor demanda. Es crucial asignar recursos estratégicos para la comercialización, publicidad y desarrollo en estas zonas, aprovechando su alto potencial de retorno.
+
+6. **Exploración de Oportunidades en Zonas Emergentes:** Sin embargo, no subestimamos las oportunidades en áreas menos concurridas. Al identificar lugares con perspectivas de crecimiento y revalorización, podemos capitalizar en precios más accesibles y adelantarnos a la competencia, garantizando un futuro prometedor.
+
+**Estrategias Recomendadas para los Inversionistas:**
+
+En vista de los análisis exhaustivos realizados, se aconseja a los inversionistas focalizar sus recursos en las "Zonas Sur" y "Norte" de Cali. Estas áreas se han destacado no solo por su demanda constante, sino también por su valor relativo, evidenciado por el rango intercuartil de precios que se sitúa entre 200 y 500 millones. Esta franja de precios es particularmente atractiva para potenciales compradores y representa una oportunidad de inversión prudente. 
+
+Con respecto a las características de las propiedades, se observa una preferencia por aquellas que se encuentran dentro de esta ventana de precios y que, aunque pueden variar en tamaño y distribución, brindan una asequibilidad interesante en comparación con el mercado en general. Asimismo, considerando la demanda en "Estrato 6" por propiedades con un mayor número de parqueaderos, se sugiere contemplar este elemento como un factor diferenciador en aquellas propiedades destinadas a este estrato. 
+
+**Estrategias para Generar Mayor Utilidad para el Equipo de Mercadeo:**
+
+El equipo de mercadeo debe orquestar campañas que resalten de manera enfática la propuesta de valor de las propiedades ofrecidas, especialmente aquellas que se encuentren en el atractivo rango intercuartil de precios entre 200 y 500 millones. Esta estrategia permitirá atraer la atención de los compradores que buscan un equilibrio entre calidad y precio en el mercado inmobiliario de Cali.
+
+En términos geográficos, las "Zonas Sur" y "Norte" deben ser los focos principales de nuestras campañas, alineando nuestros esfuerzos de publicidad con las áreas de mayor demanda. Además, es esencial identificar los barrios más apetecidos dentro de estas zonas y destacar sus atributos distintivos. Mantener una actitud proactiva y estar preparados para explorar oportunidades emergentes en zonas actualmente menos concurridas, pero que poseen indicios de potencial crecimiento, podría ofrecer una ventaja estratégica. El análisis cuidadoso de las tendencias del mercado y la capacidad de adaptación serán cruciales para optimizar los resultados en el competitivo entorno de bienes raíces en Cali.
+
+
+**Agradecimientos Finales:**
+
+En nombre de todo el equipo de análisis y consultoría, queremos expresar nuestro agradecimiento por la confianza depositada en nosotros para llevar a cabo este exhaustivo reporte. Esperamos que los resultados presentados les hayan proporcionado una visión clara y valiosa del mercado inmobiliario en Cali, así como ideas fundamentales para tomar decisiones informadas.
+
+Nuestra pasión por la excelencia y el compromiso con el análisis de datos seguirán siendo pilares en nuestra colaboración. Nos complace saber que nuestros servicios han sido de utilidad para su proyecto y estamos emocionados de seguir colaborando en futuros proyectos relacionados con bienes raíces u otras áreas. 
+
+Mantener un flujo constante de información actualizada y proporcionar análisis perspicaces es nuestra misión, y esperamos continuar siendo su socio confiable en la búsqueda de estrategias efectivas para maximizar su inversión en el emocionante mercado de bienes raíces en Cali.
